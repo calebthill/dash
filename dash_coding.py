@@ -1,4 +1,6 @@
 import unittest
+import sys
+import itertools
 
 events = [
   { 'event': 'bill.split', 'user': 'Ray Green', 'city': 'Boston', 'time_of_day': 'morning', 'timestamp': 23981398 },
@@ -10,9 +12,18 @@ events = [
 
 key_names = ['event', 'city', 'time_of_day']
 
+def validate_key_names(key_names, events):
+    for key, event in itertools.product(key_names, events):
+        k = event.get(key, None)
+        if k is None:
+            sys.exit("One of the key names is not valid")
+
 
 def group_and_count(key_names, events):
+  # Handle keys that are not valid. Not the most elegant solution, but works for this.
+    validate_key_names(key_names, events)
     stats = {}
+    
     for event in events:
         #link is the pointer to my current position in the stats dictionary
         link = stats
@@ -42,32 +53,27 @@ group_and_count(key_names, events)
 
 class MyTest(unittest.TestCase):
     
-	def test_group_and_count_return_positive(self):
-		key_names = ['event', 'city', 'time_of_day']
-		return_value = {'promo.used': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
-		self.assertEqual(group_and_count(key_names, events), return_value)
+  def test_group_and_count_return_positive(self):
+    key_names = ['event', 'city', 'time_of_day']
+    return_value = {'promo.used': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
+    self.assertEqual(group_and_count(key_names, events), return_value)
 
-	def test_group_and_count_return_length_positive(self):
-		key_names = ['event', 'city', 'time_of_day']
-		return_value = {'promo.used': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
-		self.assertEqual(len(group_and_count(key_names, events)), 2)
+  def test_group_and_count_return_length_positive(self):
+    key_names = ['event', 'city', 'time_of_day']
+    return_value = {'promo.used': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
+    self.assertEqual(len(group_and_count(key_names, events)), 2)
 
-	def test_group_and_count_return_negative(self):
-		key_names = ['event', 'city', 'time_of_day']
-		return_value = {'wrong.value': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
-		self.assertNotEqual(group_and_count(key_names, events), return_value)
+  def test_group_and_count_return_negative(self):
+    key_names = ['event', 'city', 'time_of_day']
+    return_value = {'wrong.value': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
+    self.assertNotEqual(group_and_count(key_names, events), return_value)
 
-	def test_group_and_count_return_length_negative(self):
-		key_names = ['event', 'city', 'time_of_day']
-		return_value = {'promo.used': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
-		self.assertNotEqual(len(group_and_count(key_names, events)), 4)
+  def test_group_and_count_return_length_negative(self):
+    key_names = ['event', 'city', 'time_of_day']
+    return_value = {'promo.used': {'New York': {'afternoon': 2}}, 'bill.split': {'Boston': {'evening': 1, 'morning': 1}, 'Chicago': {'evening': 1}}}
+    self.assertNotEqual(len(group_and_count(key_names, events)), 4)
 
 
 if __name__ == '__main__':
-	unittest.main()
-
-
-
-
-
-
+  unittest.main()
+  
